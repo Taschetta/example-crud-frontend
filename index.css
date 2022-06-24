@@ -1,0 +1,98 @@
+
+/* CSS Reset */
+/* Basado en: */
+/* - https://piccalil.li/blog/a-modern-css-reset/ */
+/* - https://www.joshwcomeau.com/css/custom-css-reset/ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html, body, .app {
+  height: 100%;
+}
+
+body {
+  line-height: 1.5;
+}
+
+a {
+  color: inherit;
+}
+
+input, button, textarea, select {
+  font: inherit;
+}
+
+p, h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+}
+
+/* Default Styles */
+
+* {
+  /* outline: 1px solid red; */
+}
+
+body {
+  --text-color: black;
+  --border-color: black;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Layout Styles */
+
+.app {
+  max-width: 1000px;
+  margin-inline: auto;
+  border-left: 2px solid var(--text-color);
+  border-right: 2px solid var(--text-color);
+}
+
+.app > header {
+  padding: 1rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.app > main {
+  padding: 1rem;
+}
+
+/* Utilities */
+
+.stack > * + * {
+  margin-top: 1rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* Blocks */
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--border-color);
+}
+
+.table tr {
+  border-top: 1px solid var(--border-color);
+}
+
+.table th:first-child {
+  width: 30px;
+}
+
+.table th,
+.table td {
+  text-align: center;
+  padding: 0.5rem 1rem;
+}
