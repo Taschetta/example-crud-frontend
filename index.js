@@ -21,17 +21,29 @@ function setSelectedId(selectedId) {
 
 // Por ejemplo, en una aplicacion real esta funcion se reemplazaría con un fetch
 // que traería a los usuarios desde un backend, y tendria toda esa logica aca adentro
-function filterUsers() {
-  state.users = [
+function filterUsers(search = '') {
+  const users = [
     { id: 1, nombre: 'Roberto', apellido: 'Gomez', email: 'rgomez@mail.com' },
     { id: 2, nombre: 'Aurelia', apellido: 'Armas', email: 'aarmas@mail.com' },
     { id: 3, nombre: 'Priegos', apellido: 'Ruros', email: 'pruros@mail.com' },
   ]
+
+  search = search.toLowerCase()
+
+  state.users = users.filter(user => {
+    return (
+      search === '' ||
+      user.nombre.toLowerCase().includes(search) || 
+      user.apellido.toLowerCase().includes(search) || 
+      user.email.toLowerCase().includes(search)
+    )
+  })
 }
 
 // Nodos del DOM
 // Acá traemos los nodos del DOM que necesitamos para la aplicacion
 
+const search = document.querySelector('.search')
 const table = document.querySelector('.table')
 
 // Actualizaciones al DOM
@@ -61,6 +73,11 @@ function fillTable() {
 // un evento, como un click, un submit o algo asi. 
 // Se engargan de llamar a las funciones de arriba
 
+function onSearchSubmit(search) {
+  filterUsers(search)
+  fillTable()
+}
+
 function onRadioSelectedChange(selectedId) {
   setSelectedId(selectedId)
 }
@@ -73,6 +90,11 @@ function onFirstLoad() {
 // Inicializar eventos
 // Es decir, vincular nuestras funciones de eventos
 // con los elementos del DOM
+
+search.addEventListener('submit', (event) => {
+  event.preventDefault()
+  onSearchSubmit(event.target.elements.search.value)
+})
 
 document.addEventListener('change', (event) => {
   if(event.target.matches('.radio-selected')) {

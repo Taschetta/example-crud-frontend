@@ -47,6 +47,11 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+input {
+  padding-inline: 0.5rem;
+  border: 1px solid var(--border-color);
+}
+
 /* Layout Styles */
 
 .app {
@@ -75,7 +80,38 @@ body {
   text-align: center;
 }
 
+.visually-hidden {
+  position:absolute;
+  left:-10000px;
+  top:auto;
+  width:1px;
+  height:1px;
+  overflow:hidden;
+}
+
 /* Blocks */
+
+.button-icon {
+  display: inline-block;
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  padding: 0.25rem;
+  width: 40px;
+  aspect-ratio: 1;
+}
+
+.search {
+  display: flex;
+}
+
+.search input {
+  border-left: none;
+  width: 100%;
+}
+
+.search button {
+  order: -1;
+}
 
 .table {
   width: 100%;
