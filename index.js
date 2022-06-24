@@ -1,9 +1,18 @@
 
+// Constantes de la aplicacion
+
+const USERS = [
+  { id: 1, name: 'Roberto', surname: 'Gomez', email: 'rgomez@mail.com' },
+  { id: 2, name: 'Aurelia', surname: 'Armas', email: 'aarmas@mail.com' },
+  { id: 3, name: 'Priegos', surname: 'Ruros', email: 'pruros@mail.com' },
+]
+
 // Estado de la aplicacion
 // Aca guardas las variables compartidas por todo el script
 // Como el listado de usuarios o el usuario seleccionado
 
 const state = {
+  search: '',
   selectedId: 0,
   users: []
 }
@@ -11,8 +20,20 @@ const state = {
 // Getters y Setters
 // Se encargan solamente de actualizar el estado
 
+function setSearch(search) {
+  state.search = search.toLowerCase()
+}
+
 function setSelectedId(selectedId) {
   state.selectedId = parseInt(selectedId)
+}
+
+function getSelectedId() {
+  return state.selectedId
+}
+
+function getSelected() {
+  return state.users.find(user => user.id === state.selectedId) || {}
 }
 
 // Acciones de la aplicacion
@@ -21,30 +42,44 @@ function setSelectedId(selectedId) {
 
 // Por ejemplo, en una aplicacion real esta funcion se reemplazaría con un fetch
 // que traería a los usuarios desde un backend, y tendria toda esa logica aca adentro
-function filterUsers(search = '') {
-  const users = [
-    { id: 1, nombre: 'Roberto', apellido: 'Gomez', email: 'rgomez@mail.com' },
-    { id: 2, nombre: 'Aurelia', apellido: 'Armas', email: 'aarmas@mail.com' },
-    { id: 3, nombre: 'Priegos', apellido: 'Ruros', email: 'pruros@mail.com' },
-  ]
-
-  search = search.toLowerCase()
-
+function filterUsers() {
+  const users = USERS
+  const search = state.search
   state.users = users.filter(user => {
     return (
       search === '' ||
-      user.nombre.toLowerCase().includes(search) || 
-      user.apellido.toLowerCase().includes(search) || 
+      user.name.toLowerCase().includes(search) || 
+      user.surname.toLowerCase().includes(search) || 
       user.email.toLowerCase().includes(search)
     )
   })
 }
 
+function removeUser(id) {
+  const index = USERS.findIndex(user => user.id === id)
+  USERS.splice(index, 1)
+}
+
+function upsertUser(user) {
+  if(user.id === 0) {
+    user.id = USERS[USERS.length - 1].id + 1
+    USERS.push(user)
+  } else {
+    const index = USERS.findIndex(u => u.id == user.id)
+    USERS.splice(index, 1, user)
+  }
+}
+
 // Nodos del DOM
 // Acá traemos los nodos del DOM que necesitamos para la aplicacion
 
-const search = document.querySelector('.search')
+const formSearch = document.querySelector('.search')
 const table = document.querySelector('.table')
+const buttonInsert = document.querySelector('.button-insert')
+const buttonUpdate = document.querySelector('.button-update')
+const buttonRemove = document.querySelector('.button-remove')
+const form = document.querySelector('.form-user')
+const buttonCancel = document.querySelector('.button-cancel')
 
 // Actualizaciones al DOM
 // Son funciones que se encargan solamente de moficar el DOM,
@@ -54,18 +89,65 @@ const table = document.querySelector('.table')
 // por ejemplo, esta funcion 
 // agarra el body de nuestro elemento table
 // y por cada usuario agrega una nueva fila a la tabla
-function fillTable() {
+function updateTable() {
   const body = table.querySelector('tbody')
   body.innerHTML = state.users.map(user => {
     return `
       <tr>
         <td><input class="radio-selected" type="radio" name="selected" value="${user.id}"></td>
-        <td>${user.nombre}</td>
-        <td>${user.apellido}</td>
+        <td>${user.name}</td>
+        <td>${user.surname}</td>
         <td>${user.email}</td>
       </tr>
     `
-  }).join('')
+  }).join('') || '<tr><td class="text-center" colspan="4">Sin datos</td></tr>'
+}
+
+function updateActions() {
+  if(state.selectedId === 0) {
+    buttonInsert.removeAttribute('disabled')
+    buttonUpdate.setAttribute('disabled', '')
+    buttonRemove.setAttribute('disabled', '')
+  } else {
+    buttonInsert.removeAttribute('disabled')
+    buttonUpdate.removeAttribute('disabled')
+    buttonRemove.removeAttribute('disabled')
+  }
+}
+
+function disableActions() {
+  buttonInsert.setAttribute('disabled', '')
+  buttonUpdate.setAttribute('disabled', '')
+  buttonRemove.setAttribute('disabled', '')
+}
+
+function showForm() {
+  form.removeAttribute('hidden')
+}
+
+function loadForm() {
+  const user = getSelected()
+  form.elements.name.value = user.name || ''
+  form.elements.surname.value = user.surname || ''
+  form.elements.email.value = user.email || ''
+}
+
+function cleanForm() {
+  form.elements.name.value = ''
+  form.elements.surname.value = ''
+  form.elements.email.value = ''
+}
+
+function hideForm() {
+  form.setAttribute('hidden', '')
+}
+
+function getFormData() {
+  const data = {}
+  data.name = form.elements.name.value
+  data.surname = form.elements.surname.value
+  data.email = form.elements.email.value
+  return data
 }
 
 // Eventos del DOM
@@ -74,24 +156,69 @@ function fillTable() {
 // Se engargan de llamar a las funciones de arriba
 
 function onSearchSubmit(search) {
-  filterUsers(search)
-  fillTable()
+  setSearch(search)
+  setSelectedId(0)
+  filterUsers()
+  updateTable()
+  updateActions()
 }
 
 function onRadioSelectedChange(selectedId) {
   setSelectedId(selectedId)
+  updateActions()
+}
+
+function onButtonInsertClick() {
+  disableActions()
+  setSelectedId(0)
+  loadForm()
+  showForm()
+}
+
+function onButtonUpdateClick() {
+  disableActions()
+  loadForm()
+  showForm()
+}
+
+function onButtonRemoveClick() {
+  const selectedId = getSelectedId()
+  removeUser(selectedId)
+  setSelectedId(0)
+  filterUsers()
+  updateTable()
+  updateActions()
+}
+
+function onButtonCancelClick() {
+  cleanForm()
+  hideForm()
+  updateActions()
+}
+
+function onFormSubmit() {
+  const user = getFormData()
+  user.id = getSelectedId()
+  upsertUser(user)
+  setSelectedId(0)
+  hideForm()
+  cleanForm()
+  filterUsers()
+  updateTable()
+  updateActions() 
 }
 
 function onFirstLoad() {
   filterUsers()
-  fillTable()
+  updateTable()
+  updateActions()
 }
 
 // Inicializar eventos
 // Es decir, vincular nuestras funciones de eventos
 // con los elementos del DOM
 
-search.addEventListener('submit', (event) => {
+formSearch.addEventListener('submit', (event) => {
   event.preventDefault()
   onSearchSubmit(event.target.elements.search.value)
 })
@@ -100,6 +227,27 @@ document.addEventListener('change', (event) => {
   if(event.target.matches('.radio-selected')) {
     onRadioSelectedChange(event.target.value)
   }
+})
+
+buttonInsert.addEventListener('click', (event) => {
+  onButtonInsertClick()
+})
+
+buttonUpdate.addEventListener('click', (event) => {
+  onButtonUpdateClick()
+})
+
+buttonRemove.addEventListener('click', (event) => {
+  onButtonRemoveClick()
+})
+
+buttonCancel.addEventListener('click', (event) => {
+  onButtonCancelClick()
+})
+
+form.addEventListener('submit', (event) => {
+  event.preventDefault()
+  onFormSubmit()
 })
 
 onFirstLoad()

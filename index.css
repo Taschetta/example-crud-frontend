@@ -91,7 +91,16 @@ input {
 
 /* Blocks */
 
+.button {
+  cursor: pointer;
+  display: inline-block;
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  padding: 0.25rem 0.5rem;
+}
+
 .button-icon {
+  cursor: pointer;
   display: inline-block;
   background-color: transparent;
   border: 1px solid var(--border-color);
@@ -131,4 +140,16 @@ input {
 .table td {
   text-align: center;
   padding: 0.5rem 1rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.form input,
+.form label {
+  display: block;
+  width: 100%;
 }

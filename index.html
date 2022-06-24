@@ -39,6 +39,29 @@
           </tr>
         </tbody>
       </table>
+      <div class="actions">
+        <button class="button button-insert">Agregar</button>
+        <button class="button button-update" disabled>Modificar</button>
+        <button class="button button-remove" disabled>Eliminar</button>
+      </div>
+      <form class="form form-user stack" hidden>
+        <div>
+          <label for="InputName">Nombre</label>
+          <input type="text" name="name" id="InputName">
+        </div>
+        <div>
+          <label for="InputSurname">Apellido</label>
+          <input type="text" name="surname" id="InputSurname">
+        </div>
+        <div>
+          <label for="InputEmail">Email</label>
+          <input type="email" name="email" id="InputEmail">
+        </div>
+        <div class="actions">
+          <button class="button button-cancel" type="button">Cancelar</button>
+          <button class="button button-submit" type="submit">Guardar</button>
+        </div>
+      </form>
     </main>
   </div>
 </body>
