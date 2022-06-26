@@ -1,6 +1,8 @@
 
 // Constantes de la aplicacion
 
+// En una aplicacion real, los usuarios estarían en una base de datos
+// a la que accederiamos por medio de un backend.
 const USERS = [
   { id: 1, name: 'Roberto', surname: 'Gomez', email: 'rgomez@mail.com' },
   { id: 2, name: 'Aurelia', surname: 'Armas', email: 'aarmas@mail.com' },
@@ -18,18 +20,16 @@ const state = {
 }
 
 // Getters y Setters
-// Se encargan solamente de actualizar el estado
+// Se encargan solamente de actualizar el estado (set)
+// O devolver datos calculados del estado (get)
 
+// p.ej. al actualizar el dato search, antes lo pone todo en minuscula
 function setSearch(search) {
   state.search = search.toLowerCase()
 }
 
 function setSelectedId(selectedId) {
   state.selectedId = parseInt(selectedId)
-}
-
-function getSelectedId() {
-  return state.selectedId
 }
 
 function getSelected() {
@@ -40,8 +40,8 @@ function getSelected() {
 // Al igual que los getters y setters, se encargan de modificar el estado
 // pero tambien pueden tener mas logica aparte de modificar el estado
 
-// Por ejemplo, en una aplicacion real esta funcion se reemplazaría con un fetch
-// que traería a los usuarios desde un backend, y tendria toda esa logica aca adentro
+// Por ejemplo, en una aplicacion real esta funcion llamaría a un backend 
+// con fetch para traer a los usuarios
 function filterUsers() {
   const users = USERS
   const search = state.search
@@ -60,25 +60,29 @@ function removeUser(id) {
   USERS.splice(index, 1)
 }
 
-function upsertUser(user) {
-  if(user.id === 0) {
-    user.id = USERS[USERS.length - 1].id + 1
-    USERS.push(user)
+function upsertUser(data) {
+  if(data.id === 0) {
+    data.id = USERS[USERS.length - 1].id + 1
+    USERS.push(data)
   } else {
-    const index = USERS.findIndex(u => u.id == user.id)
-    USERS.splice(index, 1, user)
+    const index = USERS.findIndex(user => user.id == data.id)
+    USERS.splice(index, 1, data)
   }
 }
 
 // Nodos del DOM
 // Acá traemos los nodos del DOM que necesitamos para la aplicacion
 
+
 const formSearch = document.querySelector('.search')
 const table = document.querySelector('.table')
+
 const buttonInsert = document.querySelector('.button-insert')
 const buttonUpdate = document.querySelector('.button-update')
 const buttonRemove = document.querySelector('.button-remove')
+
 const form = document.querySelector('.form-user')
+
 const buttonCancel = document.querySelector('.button-cancel')
 
 // Actualizaciones al DOM
@@ -89,6 +93,7 @@ const buttonCancel = document.querySelector('.button-cancel')
 // por ejemplo, esta funcion 
 // agarra el body de nuestro elemento table
 // y por cada usuario agrega una nueva fila a la tabla
+
 function updateTable() {
   const body = table.querySelector('tbody')
   body.innerHTML = state.users.map(user => {
@@ -182,7 +187,7 @@ function onButtonUpdateClick() {
 }
 
 function onButtonRemoveClick() {
-  const selectedId = getSelectedId()
+  const selectedId = state.selectedId
   removeUser(selectedId)
   setSelectedId(0)
   filterUsers()
@@ -198,7 +203,7 @@ function onButtonCancelClick() {
 
 function onFormSubmit() {
   const user = getFormData()
-  user.id = getSelectedId()
+  user.id = state.selectedId
   upsertUser(user)
   setSelectedId(0)
   hideForm()
